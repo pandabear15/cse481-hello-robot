@@ -5,7 +5,7 @@ from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 import hello_helpers.hello_misc as hm
-import JointCommand;
+import JointCommand
 
 
 class MotionNode(hm.HelloNode):
