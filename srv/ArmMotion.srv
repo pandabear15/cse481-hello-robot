@@ -1,2 +1,3 @@
+string motion_type
 ---
 msg/ArmJointPos[] position_list

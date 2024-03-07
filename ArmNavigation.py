@@ -5,13 +5,54 @@ from tf2_ros import TransformException
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener
 import hello_helpers.hello_misc as hm
+from geometry_msgs.msg import PoseStamped
+from lotion_application.srv import ArmMotion
+from lotion_applicaiton.msg import ArmJointPos
+import stretch_funmap.manipulation_planning as mp
 
 class ArmNavigationNode(hm.HelloNode):
     def __init__(self):
         hm.HelloNode.__init__(self)
-        # potentially more initialization steps needed here
+        towel_loc_subscriber = self.create_subscription(PoseStamped,
+                'detection/towel', callback=self.towel_loc_callback, qos_profile=10)
+        target_loc_subscriber = self.create_subscription(PoseStamped,
+                'detection/target', callback=self.target_loc_callback, qos_profile=10)
+        self.towel_loc = None
+        self.target_loc = None
+        self.srv = self.create_service(ArmMotion, 'create_arm_path', self.serv_callback)
 
+    def serv_callback(self, request, response):
+        self.get_logger().info('ArmNavigationNode received request: ' + request.motion_type)
+        if request.motion_type == 'towel':
+            response.position_list = self.get_towel_path()
+        elif request.motion_type == 'target':
+            response.position_list = self.get_target_path()
+        else:
+            response.position_list = None
+        return response
 
+    def get_towel_path(self):
+        '''
+
+        :return:
+        '''
+        # get above target, lower arm to right above target, then close gripper
+        pass
+
+    def get_target_path(self):
+        '''
+        Determines an appropriate wiping pattern as a sequence of arm joint positions.
+        :return:
+        '''
+        # get above target, lower arm to one corner, wipe in zig zag motion until whole surface
+        # is covered
+        pass
+
+    def towel_loc_callback(self, pose_stamped):
+        self.towel_loc = pose_stamped
+
+    def target_loc_callback(self, pose_stamped):
+        self.target_loc = pose_stamped
 
     def frame_convert(self, old_pose, new_frame):
         """
