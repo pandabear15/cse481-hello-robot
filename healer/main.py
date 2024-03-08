@@ -58,9 +58,6 @@ class Robot(Node):
     # is within epsilon of the end joint position
     def wasTrajectorySuccessful(self, joint_name, targetJointPos, epsilon):
         posDiff = self.readCurrentPos(joint_name) - targetJointPos
-        
-        print (self.joint_state)
-        print ((math.fabs(posDiff) < epsilon))
         return (math.fabs(posDiff) < epsilon)
     
     # repeatedly check if a Follow Trajectory Goal has successfully finished
@@ -78,10 +75,9 @@ class Robot(Node):
 
         return success
     
-    # execute all specified trajectories. trajectories is a 2d array. the rows are trajectories, and columns
+    # execute multiple movement trajectories back to back. trajectories is a 2d array. the rows are trajectories, and columns
     # are trajectory elements. each trajectory has 4 parts. The first 3 parts correspond to the MovementExecutor.execute  
-    # function's parameters. The 4th part is status info to identify a finished trajectory
-    # index 0: joint names | index 1: seconds | index 2 positions
+    # function's parameters (joint names, seconds, positions). The 4th part is status info to identify a finished trajectory
     def executeTrajectories(self, movementExecutor, trajectories):
         for trajectory in trajectories:
             movementExecutor.execute(trajectory[0], False, trajectory[1], trajectory[2])
@@ -97,8 +93,6 @@ class Robot(Node):
 
         movementExecutor = MovementExecutor(self)
         trajectories = Trajectories()
-        #ik = InverseKinematics(read_write_api, base.Base())
-        # target_point = [-0.043, -0.441, 0.654]
         
         while (True):
             self.executeTrajectories(movementExecutor, trajectories.CleanForearm())
@@ -110,7 +104,11 @@ class Robot(Node):
         while (True):
             time.sleep(1)
             
-        # if True:
+        # TO-DO: Finish fixing Inverse Kinematics before uncommenting
+            
+        # ik = InverseKinematics(read_write_api, base.Base())
+        # target_point = [-0.043, -0.441, 0.654]
+        #    if True:
         #     # Calculate target point based on a sine wave
         #     t = time.time()  # Get current time
         #     offset = 0  # Offset for the sine wave
