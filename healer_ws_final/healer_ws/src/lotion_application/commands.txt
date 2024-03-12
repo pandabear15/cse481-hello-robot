@@ -1,0 +1,25 @@
+stretch_robot_home.py  // calibration
+c   // terminate all processes
+
+c   // test stow_command
+ros2 run rviz2 rviz2 -d 'ros2 pkg prefix --share stretch_calibration'/rviz/stretch_simple_test.rviz  // start rviz2
+
+// core driver in one bash terminal (to run our api)
+ros2 launch stretch_core stretch_driver.launch.py mode:=position
+ros2 launch stretch_core stretch_driver.launch.py mode:=trajectory
+
+// api 
+python3 ./healer/main.py
+
+rosrun stretch_calibration update_uncalibrated_urdf.sh
+roslaunch stretch_calibration collect_check_head_calibration_data.launch
+rosrun stretch_calibration check_head_calibration.sh
+
+to access joint and linaslinsadd
+go to main directory (outside cse_481)
+  -> stretch_user
+  -> stretch_re2_2049 for parameters
+-> vim into exported_urdf
+-> select stretch.urdf
+
+roslaunch stretch_description display.launch   // base coordinate frame
