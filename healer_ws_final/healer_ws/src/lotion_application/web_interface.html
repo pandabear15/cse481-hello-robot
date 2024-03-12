@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/eventemitter2@6.4.9/lib/eventemitter2.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/roslib@1/build/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+  // Connecting to ROS
+  // -----------------
+
+  var ros = new ROSLIB.Ros({
+    url : 'ws://slinky.hcrlab.cs.washington.edu:9090'
+  });
+
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+  });
+
+  ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+  });
+
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+  });
+
+  var rosClient = new ROSLIB.ActionClient({
+    ros: ros,
+    serverName: 'lotion_application',
+    actionName: 'lotion_application/CallRobot'
+  });
+
+  var forearm_goal = new ROSLIB.Goal({
+    actionClient: rosClient,
+    goalMessage: {
+        action_type: 'forearm'
+    }
+  });
+
+  var back_goal = new ROSLIB.Goal({
+    actionClient: rosClient,
+    goalMessage: {
+        action_type: 'back'
+    }
+  });
+
+  forearm_goal.on('result', function(result){
+    console.log('Result code: ' + result.completion)
+    document.getElementById("btn").disable = false;
+  })
+
+  back_goal.on('result', function(result){
+    console.log('Result code: ' + result.completion)
+    document.getElementById("btn").disable = false;
+  })
+
+  forearm_goal.on('feedback', function(feedback){
+    console.log(feedback)
+  })
+
+  back_goal.on('feedback', function(feedback){
+    console.log(feedback)
+  })
+
+  function publish_goal(){
+    str = document.getElementById("options").value
+    if(str == 'forearm'){
+        console.log('Forearm goal set')
+        forearm_goal.send();
+    }
+    else if(str == 'back'){
+        console.log('Back goal set')
+        back_goal.send();
+    }
+    document.getElementById("btn").disabled = true;
+  }
+
+</script>
+</head>
+
+<body>
+  <h1></h1>
+  <div class="selection">
+    <label for="options">Select a body part to clean.</label>
+    <select name="options" id="options">
+        <option></option>
+        <option value="forearm">Forearm</option>
+        <option value="back">Back</option>
+    </select>
+  </div>
+  <button onclick="publish_goal()" id="btn">Start cleaning</button>
+</body>
+</html>

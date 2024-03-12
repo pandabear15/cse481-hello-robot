@@ -1,0 +1,69 @@
+
+        # Limb joint notes:
+
+        # Axes reference: 
+        # let the x-axis be parallel to the robot's arm (+x is direction the arm points)
+        # let y-axis be vertical (+y is towards the ceiling)
+        # let z-axis be horizontally perpendicular to the robot's arm (+z is towards the side with wheels)
+
+        # wrist_extension: [0.0, 0.4] (retract arm backwards vs extend arm forwards)
+        #   - if you still get a wrist extension Guarded arm error, lower the 0.4 value
+        #   - the robot doesn't want its arm too overly extended
+        # joint_lift: [0, 1.1] (translates arm up or down)
+        # joint_gripper_finger_right: [-3.14, 3.14] (closes gripper on object or opens gripper)
+        #   - do not use joint_gripper_finger_left simulatenously. it does the same thing 
+        # joint_wrist_pitch: [-3.14, 3.14] (rotates gripper around z-axis)
+        #   - rotate gripper to face -y direction / vertically downwards (-3.14)
+        #   - rotate gripper to face +x direction (0)
+        #   - rotate gripper to be 30% +y direction, 70% +x direction (3.14)
+        # joint_wrist_roll: [-3.14, 3.14] (rotates gripper around y-axis)
+        #  - rotate gripper side with the OC 2204 sticker to face +x direction (0)
+        #  - rotate gripper side with the OC 2204 sticker to face -x direction (3.14 or -3.14)
+        #  - increasing angle = rotate clockwise
+        # translate_mobile_base: [-inf, inf] (move these many meters along the z-axis)
+        #  - negative value -> moves in -z axis
+        #  - positive value -> moves in +z axis
+        # rotate_mobile_base: [-3.14, 3.14]?
+        # - positive values -> counterclock wise rotation around +y axis
+        # - negative values -> clockwise wise rotation around +y axis
+        # - DO NOT use the value 0.0 or an error will get thrown in JointTrajectory
+        # - Often 3.14 corresponds to a ~150 degree rotation for us (but occasionally more).
+        #   Ideal value was likely meant to be 180 degrees, but doesn't always happen in practice
+        
+        # Notes
+        # for some weird reason, moving the joint gripper finger to the position 3.14 makes it read a position of 0.22
+        # from joint_state. Likely a bug with ROS. Most joint state's positions read are accurate for other limbs
+        # Those with inaccurate pos readings are not great for IK, namely:
+        #  
+        # 1) joint_wrist_pitch (pos divided by 2 for values <= 0. pos randomly hovers around 0.4 for values > 0)
+        # 2) joint_gripper_finger_right (pos off by a lot)
+
+        
+        # Axis of actual robot when using IK:
+        # -x means to the right of arm
+        # +x means to the left of arm
+        # -y means in front of arm
+        # +y means behind arm
+        # negative translation means to the right of arm (-x -> 0)
+        # positive translation means to the left of arm (+x -> 0)
+        # -1.57 rotation means 90 degree clockwise rotation relative to arm
+        # 1.57 rotation means 90 degree cc rotation relative to arm
+
+        -10, -10
+        10, -10
+
+        if y is negative
+          add 0.8
+        if y is positive
+          subtract 0.8
+        then z = -y
+
+        to move forwards
+        -1.57
+        +x the amount u want to travel forwards (by amount z)
+        +1.57
+
+        goal: 0, -0.8
+
+
+        
